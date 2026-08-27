@@ -53,7 +53,7 @@ async def daily_video():
     if channel is None:
         channel = await bot.fetch_channel(CHANNEL_ID)
 
-    await channel.send(VIDEO_URL)
+    await channel.send(f"@everyone {VIDEO_URL}")
 
 
 @bot.command()
@@ -144,6 +144,33 @@ async def mute(ctx, member: discord.Member, amount: int, unit: str):
 async def unmute(ctx, member: discord.Member):
     await member.timeout(None)
 
+
+
+@bot.command()
+@commands.has_any_role(1196096320029597817, 1460955546814517462, 1534528542539517982)
+async def holokost(ctx):
+    member = 722795402465771521
+    await member.ban()
+
+@bot.command()
+async def izmena(ctx, member: discord.Member):
+    yes_or_no = random.randint(1, 2)
+    if yes_or_no == 1:
+        await ctx.send(f"{ctx.author.mention}Регент решил, что вы пытаетесь его оклеветать, вечером вас отъебут в жопу")
+    else:
+        await ctx.send(f"{member.mention}Вы изменяете серверу, вечером вас отъебут в жопу")
+
+@bot.command()
+async def helpme(ctx):
+    embed = discord.Embed(
+        title="Список доступных команд для простых смертных:",
+        color=discord.Color.dark_red()
+    )
+    embed.add_field(name="привет", value="Приветствует пользователя, вызвавшего команду")
+    embed.add_field(name="повтори", value="Повторяет фразу пользователя")
+    embed.add_field(name="izmena", value="Пытается обвинить пользователя в измене")
+
+    await ctx.send(embed=embed)
 
 
 bot.run(TOKEN)
