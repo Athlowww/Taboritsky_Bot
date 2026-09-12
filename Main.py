@@ -6,10 +6,13 @@ import datetime
 from zoneinfo import ZoneInfo
 import random
 import os
+import json
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 FFMPEG_PATH = r"E:\ffmpeg\bin\ffmpeg.exe"
+with open("dates.json", "r", encoding="utf-8") as f:
+    holiday = json.load(f)
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -171,6 +174,38 @@ async def helpme(ctx):
     embed.add_field(name="izmena", value="Пытается обвинить пользователя в измене")
 
     await ctx.send(embed=embed)
+
+
+@bot.command()
+async def govno(ctx):
+    await ctx.send("https://www.youtube.com/shorts/RRBA2hFtgpQ")
+
+def holiday_today() -> str | None:
+    today = datetime.date.today()
+    key = f"{today.day:02d}-{today.month:02d}"
+    return holiday.get(key, [])
+
+
+@tasks.loop(hours=24)
+async def check_holiday(ctx):
+    events = holiday_today()
+    if not events:
+        return
+
+    channel = bot.get_channel(1297188411458715668)
+    if channel is None:
+        return
+
+    lines = []
+    for e in events:
+        name = e["название"]
+        year = e["год"]
+        desc = e["описание"]
+        lines.append(f"**{name}** ({year})\n{desc}")
+
+    text = "Сегодня великий праздник!\n\n" + "\n\n".join(lines)
+    await channel.send(text)
+
 
 
 bot.run(TOKEN)
