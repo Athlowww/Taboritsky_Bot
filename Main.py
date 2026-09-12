@@ -151,7 +151,7 @@ async def tribunal(ctx):
 
     def kicker(error):
         async def _kick_and_disconnect():
-            victim = random.choice(candidates)
+            victim = secrets.choice(candidates)
             await victim.move_to(None)
 
             text_channel = bot.get_channel(TEXT_CHANNEL_ID)
