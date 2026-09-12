@@ -225,8 +225,7 @@ async def randomdm(ctx, *, text: str = "Ты сын пакостной шала�
     members = [m for m in guild.members if not m.bot and not m.bot]
     member = secrets.choice(members)
     try:
-        await member.send(text)
-        await ctx.send(f"{member.mention}, я твою мертвую мать ногами топтал")
+        await member.send(f"{member.mention}, я твою мертвую мать ногами топтал")
     except discord.Forbidden:
         return
 
