@@ -3,6 +3,7 @@ from discord.ext import commands, tasks
 from dotenv import load_dotenv
 from datetime import time
 import datetime
+import secrets
 from zoneinfo import ZoneInfo
 import random
 import os
@@ -26,19 +27,52 @@ CHANNEL_ID = 1173116313514811422
 VIDEO_URL = "https://www.youtube.com/watch?v=audMhJIcN08&list=RDaudMhJIcN08"
 MSK = ZoneInfo("Europe/Moscow")
 
+def holiday_today() -> str | None:
+    today = datetime.date.today()
+    key = f"{today.day:02d}-{today.month:02d}"
+    return holiday.get(key, [])
 
+
+
+
+@tasks.loop(hours=24)
+async def randomdmday(ctx, *, text: str = "Ты сын пакостной шалавы!"):
+    guild = ctx.guild
+    members = [m for m in guild.members if not m.bot and not m.bot]
+    member = secrets.choice(members)
+    try:
+        await member.send(text)
+        await ctx.send(f"{member.mention}, я твою мертвую мать ногами топтал")
+    except discord.Forbidden:
+        return
+
+
+
+@tasks.loop(hours=24)
+async def check_holiday(ctx):
+    events = holiday_today()
+    if not events:
+        return
+
+    channel = bot.get_channel(1297188411458715668)
+    if channel is None:
+        return
+
+    lines = []
+    for e in events:
+        name = e["название"]
+        year = e["год"]
+        desc = e["описание"]
+        lines.append(f"**{name}** ({year})\n{desc}")
+
+    text = "Сегодня великий праздник!\n\n" + "\n\n".join(lines)
+    await channel.send(text)
 
 @bot.event
 async def on_ready():
     print(f"TIK TAK MOTHERFUCKER: {bot.user}")
     if not daily_video.is_running():
         daily_video.start()
-
-
-@bot.command()
-async def привет(ctx):
-    await ctx.send(f"Доброе утро {ctx.author.mention}")
-
 
 @bot.event
 async def on_message(message):
@@ -48,6 +82,11 @@ async def on_message(message):
         text = message.content[8:]
         await message.channel.send(text)
     await bot.process_commands(message)
+
+
+@bot.command()
+async def привет(ctx):
+    await ctx.send(f"Доброе утро {ctx.author.mention}")
 
 
 @tasks.loop(time=time(hour=0, minute=0, tzinfo=MSK))
@@ -180,32 +219,16 @@ async def helpme(ctx):
 async def govno(ctx):
     await ctx.send("https://www.youtube.com/shorts/RRBA2hFtgpQ")
 
-def holiday_today() -> str | None:
-    today = datetime.date.today()
-    key = f"{today.day:02d}-{today.month:02d}"
-    return holiday.get(key, [])
-
-
-@tasks.loop(hours=24)
-async def check_holiday(ctx):
-    events = holiday_today()
-    if not events:
+@bot.command()
+async def randomdm(ctx, *, text: str = "Ты сын пакостной шалавы!"):
+    guild = ctx.guild
+    members = [m for m in guild.members if not m.bot and not m.bot]
+    member = secrets.choice(members)
+    try:
+        await member.send(text)
+        await ctx.send(f"{member.mention}, я твою мертвую мать ногами топтал")
+    except discord.Forbidden:
         return
-
-    channel = bot.get_channel(1297188411458715668)
-    if channel is None:
-        return
-
-    lines = []
-    for e in events:
-        name = e["название"]
-        year = e["год"]
-        desc = e["описание"]
-        lines.append(f"**{name}** ({year})\n{desc}")
-
-    text = "Сегодня великий праздник!\n\n" + "\n\n".join(lines)
-    await channel.send(text)
-
 
 
 bot.run(TOKEN)
